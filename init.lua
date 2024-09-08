@@ -1,6 +1,8 @@
 require'basic_config'
 require'keymaps'
 require'snippets'
+require'plugins'
+require'monokai'.setup{ palette = require'monokai'.pro}
 print(">^.^< happy coding mio~")
 
 vim.cmd([[autocmd BufNewFile * :write]])
