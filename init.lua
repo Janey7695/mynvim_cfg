@@ -4,6 +4,7 @@ require'snippets'
 require'plugins'
 require'monokai'.setup{ palette = require'monokai'.pro}
 require'lsp'
+require'config.nvim-tree-cfg'
 print(">^.^< happy coding mio~")
 
 vim.cmd([[autocmd BufNewFile * :write]])

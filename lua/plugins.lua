@@ -41,4 +41,15 @@ require("lazy").setup({
             "L3MON4D3/LuaSnip",
             version = "v2.*",
     },
+    {
+      "nvim-tree/nvim-tree.lua",
+      version = "*",
+      lazy = false,
+      dependencies = {
+        "nvim-tree/nvim-web-devicons",
+      },
+      config = function()
+        require("nvim-tree").setup {}
+      end,
+    }
 })
