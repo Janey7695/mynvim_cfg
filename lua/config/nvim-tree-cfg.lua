@@ -5,7 +5,7 @@ vim.opt.termguicolors = true
 
 
 local api = require'nvim-tree.api'
-vim.keymap.set('n','<space>e',':NvimTreeToggle<CR>',{noremap = true,silent = true,nowait = true})
+vim.keymap.set('n','<space>o',':NvimTreeToggle<CR>',{noremap = true,silent = true,nowait = true})
 api.events.subscribe(api.events.Event.FileCreated,function (file)
     vim.cmd("tabnew " .. file.fname)
 end)
