@@ -36,6 +36,7 @@ require("lazy").setup({
     "williamboman/mason.nvim",
     "williamboman/mason-lspconfig.nvim",
     "neovim/nvim-lspconfig",
+    "mhartington/formatter.nvim",
     -- Code snippet engine
     {
             "L3MON4D3/LuaSnip",
