@@ -12,7 +12,7 @@
 │   ├── plugins.lua               # lazy.nvim 插件清单（含 blink.cmp 配置）
 │   ├── lsp.lua                   # LSP：mason + vim.lsp.config/enable
 │   └── config/
-│       ├── nvim-tree-cfg.lua     # 文件树
+│       ├── neo-tree-cfg.lua       # 文件树
 │       └── nvim-formatter-cfg.lua# 保存时格式化
 └── KEYBINDINGS.md                 # 完整快捷键与插件清单（详见此文件）
 ```
@@ -57,7 +57,7 @@ nvim   # 首次启动会自动装好所有插件和 LSP server
   | JSON / JSONC | `prettier` | mason 自动 |
   | Bash / sh | `shfmt` | mason 自动 |
   | 所有文件 | 去行尾空白 | 内置 |
-- **文件树**：[nvim-tree.lua](https://github.com/nvim-tree/nvim-tree.lua)
+- **文件树**：[neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim) v3（内置 Git 状态显示）
 
 完整的插件列表、每个插件干什么、以及所有快捷键的对照表，见 **[KEYBINDINGS.md](./KEYBINDINGS.md)**。
 

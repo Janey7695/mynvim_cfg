@@ -4,7 +4,7 @@ require'snippets'
 require'plugins'
 require'monokai'.setup{ palette = require'monokai'.pro}
 require'lsp'
-require'config.nvim-tree-cfg'
+require'config.neo-tree-cfg'
 require'config.nvim-formatter-cfg'
 print(">^.^< happy coding mio~")
 

@@ -20,7 +20,8 @@ Leader 键统一为 **空格 `<space>`**。
 | [`williamboman/mason-lspconfig.nvim`](https://github.com/williamboman/mason-lspconfig.nvim) | mason ↔ lspconfig 之间的桥；自动安装 `pylsp` / `lua_ls` / `clangd` / `bash-language-server` / `json-lsp` |
 | [`neovim/nvim-lspconfig`](https://github.com/neovim/nvim-lspconfig) | 各 LSP server 的默认配置表（配合内置 `vim.lsp.config` 使用） |
 | [`mhartington/formatter.nvim`](https://github.com/mhartington/formatter.nvim) | 保存时自动格式化（Lua→stylua, C/C++→clang-format, JSON→prettier, Bash/sh→shfmt, 全部→去行尾空白） |
-| [`nvim-tree/nvim-tree.lua`](https://github.com/nvim-tree/nvim-tree.lua) | 文件树侧栏 |
+| [`nvim-neo-tree/neo-tree.nvim`](https://github.com/nvim-neo-tree/neo-tree.nvim) (v3.x) | 文件树侧栏，内置 Git 状态、诊断图标 |
+| [`nvim-lua/plenary.nvim`](https://github.com/nvim-lua/plenary.nvim) + [`MunifTanjim/nui.nvim`](https://github.com/MunifTanjim/nui.nvim) | neo-tree 依赖的两个库（由 lazy 管理） |
 | [`nvim-tree/nvim-web-devicons`](https://github.com/nvim-tree/nvim-web-devicons) | 文件类型图标 |
 
 > 已迁走的旧插件：`nvim-cmp` / `cmp-nvim-lsp` / `cmp-buffer` / `cmp-path` / `cmp-cmdline` / `lspkind.nvim`，全部由 blink.cmp 内置功能替代。
@@ -107,16 +108,23 @@ Leader 键统一为 **空格 `<space>`**。
 
 > ⚠️ 注意有重叠：`<C-k>` 既在 blink 里是"切换签名窗口"，又在 LSP 里是 `signature_help`。LSP 的 buffer 键位只在某个 LSP 客户端附着后才绑，blink 的补全键在 insert 时触发，两者默认场景错开，基本不冲突；但在 LSP 的浮窗签名体验上，blink 的签名功能更现代。
 
-### 5. 文件树 nvim-tree（`lua/config/nvim-tree-cfg.lua`）
+### 5. 文件树 neo-tree（`lua/config/neo-tree-cfg.lua`）
 
 | 按键 | 模式 | 动作 |
 |---|---|---|
-| `<space>o` | normal | `:NvimTreeToggle` 打开/关闭文件树 |
-| `<CR>` | 文件树内 | tab_drop 打开（在当前 tab 内替换） |
-| `<C-t>` | 文件树内 | 把父目录设为 root |
+| `<space>o` | normal | `:Neotree filesystem toggle` 打开/关闭文件树 |
+| `<CR>` | 文件树内 | 打开文件 |
+| `<bs>` | 文件树内 | 回到父目录 |
 | `?` | 文件树内 | 切换帮助说明 |
+| `a` | 文件树内 | 新建文件 |
+| `d` | 文件树内 | 删除文件 |
+| `r` | 文件树内 | 重命名 |
+| `c` / `m` | 文件树内 | 复制 / 移动 |
+| `/` | 文件树内 | 模糊搜索文件 |
+| `H` | 文件树内 | 切换隐藏文件的显示 |
+| `<` / `>` | 文件树内 | 上一个 / 下一个源 |
 
-设置：宽 30 列、大小写敏感排序、隐藏 dotfiles、新建文件会自动 `tabnew` 打开。
+设置：宽 30 列，左栏，大小写敏感排序，显示 dotfiles，Git 状态图标，当前文件自动跟随。
 
 ### 6. 文本片段 / 引号配对（`lua/snippets.lua`）
 
