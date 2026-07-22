@@ -61,5 +61,37 @@ vim.lsp.config('lua_ls', { capabilities = capabilities })
 vim.lsp.config('pylsp', { capabilities = capabilities })
 vim.lsp.config('clangd', { capabilities = capabilities })
 
+-- Apple Swift / ObjC / ObjC++：用 Xcode 自带的 sourcekit-lsp
+-- "不要" 加入 mason 的 ensure_installed（它由 Xcode 提供）
+-- 已知坑：sourcekit-lsp 期望 language id = 'objective-c' / 'objective-cpp'，
+-- 而 Neovim 默认把 .m/.mm 设为 'objc'/'objcpp'，会导致 ObjC 文件不补全。
+-- 用 vim.filetype.add 把 .m/.mm 映射到 sourcekit 期望的名字解决。
+vim.filetype.add({
+    extension = {
+        ['m']   = 'objective-c',
+        ['mm']  = 'objective-cpp',
+        ['swift'] = 'swift',
+    },
+})
+vim.lsp.config('sourcekit', {
+    cmd = { 'xcrun', 'sourcekit-lsp' },
+    filetypes = { 'swift', 'objective-c', 'objective-cpp', 'c', 'cpp' },
+    root_dir = function(bufnr, on_dir)
+        -- 新 API 的 root_dir 回调签名是 (bufnr, on_dir)；bufnr 是整数 buffer 号。
+        -- 参见 :help vim.lsp.config
+        local path = vim.api.nvim_buf_get_name(bufnr)
+        -- 从文件向上找项目标记：SwiftPM / Xcode 项目 / workspace / compile db / git
+        local root = vim.fs.root(path, {
+            'Package.swift',
+            '*.xcodeproj',
+            '*.xcworkspace',
+            'compile_commands.json',
+            '.git',
+        }) or vim.fs.dirname(path)
+        on_dir(root)
+    end,
+    capabilities = capabilities,
+})
+
 -- 真正启用这些 server
-vim.lsp.enable({ 'lua_ls', 'pylsp', 'clangd' })
+vim.lsp.enable({ 'lua_ls', 'pylsp', 'clangd', 'sourcekit' })

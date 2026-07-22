@@ -50,7 +50,9 @@ vim.cmd([[autocmd FileType markdown lua AddSurroundx("`","`",1)]])
 -- vim.cmd([[autocmd FileType markdown inoremap <buffer> <leader>` ```]])
 vim.cmd([[autocmd FileType markdown inoremap <buffer> ;; <esc>A;<cr>]])
 
-for _, ft in ipairs({ 'c', 'cpp', 'objc', 'objcpp' }) do
+-- 兼容 Neovim 默认 (objc/objcpp) 和 sourcekit-lsp 期望的 (objective-c/objective-cpp)，
+-- 后者由 lsp.lua 里的 vim.filetype.add 对 .m/.mm 设定
+for _, ft in ipairs({ 'c', 'cpp', 'objc', 'objcpp', 'objective-c', 'objective-cpp' }) do
     vim.cmd(string.format([[autocmd FileType %s inoremap <buffer> ;; <esc>A;<cr>]], ft))
     vim.cmd(string.format([[autocmd FileType %s inoremap <buffer> <leader>pp <esc>A<space>{}<esc>i<cr><esc>O]], ft))
     vim.cmd(string.format([[autocmd FileType %s inoremap <buffer> ,, <esc>la,]], ft))
