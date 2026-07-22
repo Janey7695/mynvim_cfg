@@ -17,9 +17,9 @@ Leader 键统一为 **空格 `<space>`**。
 | [`saghen/blink.cmp`](https://github.com/saghen/blink.cmp) (v1.*) | **补全引擎**。内置 LSP / path / snippets / buffer 四个补全源，并自带 lspkind 风格的图标；用 Rust + SIMD 模糊匹配器（失败自动回落 Lua） |
 | [`L3MON4D3/LuaSnip`](https://github.com/L3MON4D3/LuaSnip) (v2.*) | 代码片段引擎，被 blink.cmp 调用展开 snippet 候选 |
 | [`williamboman/mason.nvim`](https://github.com/williamboman/mason.nvim) | LSP / formatter / linter 的"包管理器"，对应 `:Mason` 浮窗 |
-| [`williamboman/mason-lspconfig.nvim`](https://github.com/williamboman/mason-lspconfig.nvim) | mason ↔ lspconfig 之间的桥；自动安装 `pylsp` / `lua_ls` / `clangd` |
+| [`williamboman/mason-lspconfig.nvim`](https://github.com/williamboman/mason-lspconfig.nvim) | mason ↔ lspconfig 之间的桥；自动安装 `pylsp` / `lua_ls` / `clangd` / `bash-language-server` / `json-lsp` |
 | [`neovim/nvim-lspconfig`](https://github.com/neovim/nvim-lspconfig) | 各 LSP server 的默认配置表（配合内置 `vim.lsp.config` 使用） |
-| [`mhartington/formatter.nvim`](https://github.com/mhartington/formatter.nvim) | 保存时自动格式化（ Lua 用 stylua，C++ 用 clang-format，所有文件去行尾空白） |
+| [`mhartington/formatter.nvim`](https://github.com/mhartington/formatter.nvim) | 保存时自动格式化（Lua→stylua, C/C++→clang-format, JSON→prettier, Bash/sh→shfmt, 全部→去行尾空白） |
 | [`nvim-tree/nvim-tree.lua`](https://github.com/nvim-tree/nvim-tree.lua) | 文件树侧栏 |
 | [`nvim-tree/nvim-web-devicons`](https://github.com/nvim-tree/nvim-web-devicons) | 文件类型图标 |
 
@@ -27,15 +27,18 @@ Leader 键统一为 **空格 `<space>`**。
 
 ### 启用的 LSP server
 
-通过 `vim.lsp.enable({ 'lua_ls', 'pylsp', 'clangd' })` 启用（见 `lua/lsp.lua`）：
+通过 `vim.lsp.enable()` 启用（见 `lua/lsp.lua`）：
 
-| Server | 语言 |
-|---|---|
-| `lua_ls` | Lua（也用于编辑 Neovim 配置本身） |
-| `pylsp` | Python |
-| `clangd` | C / C++ |
+| Server | 语言 | 安装方式 |
+|---|---|---|
+| `lua_ls` | Lua（也用于编辑 Neovim 配置本身） | mason 自动 |
+| `pylsp` | Python | mason 自动 |
+| `clangd` | C / C++ | mason 自动 |
+| `jsonls` | JSON / JSONC | mason 自动 |
+| `bashls` | Bash / sh | mason 自动 |
+| `sourcekit` | Swift / ObjC / ObjC++ | Xcode 自带 |
 
-mason 会在首次启动时自动安装以上三个。
+> 注意：`.m` / `.mm` 文件类型被 `vim.filetype.add` 映射为 `objective-c` / `objective-cpp`以满足 sourcekit-lsp 的要求（见 known issue #3264）。
 
 ---
 
@@ -137,15 +140,14 @@ mason 会在首次启动时自动安装以上三个。
 
 | 按键 | 文件类型 | 效果 |
 |---|---|---|
-| `;;` | markdown | 行尾加 `;` + 换行 |
-| `;;` | cpp | 行尾加 `;` + 换行 |
+| `;;` | c / cpp / objc / objcpp / objective-c / objective-cpp / markdown | 行尾加 `;` + 换行 |
 
 #### 其它文件类型快捷键（insert 模式）
 
 | 按键 | 文件类型 | 效果 |
 |---|---|---|
-| `<space>pp` | cpp | 末尾加 `{}` 并展开成块 |
-| `,,` | cpp / lua | 在右侧插入逗号 |
+| `<space>pp` | c / cpp / objc / objcpp / objective-c / objective-cpp | 末尾加 `{}` 并展开成块 |
+| `,,` | c / cpp / objc / objcpp / objective-c / objective-cpp / **lua** | 在右侧插入逗号 |
 
 #### vim 文件类型的缩写（insert 模式）
 
@@ -158,10 +160,12 @@ mason 会在首次启动时自动安装以上三个。
 
 ### 7. 格式化（`lua/config/nvim-formatter-cfg.lua`）
 
-无快捷键，**保存即格式化**（`BufWritePost → :FormatWrite`）。
+无快捷键，**保存即格式化**（`BufWritePre → :Format`）。
 
 - Lua：stylua（文件名为 `special.lua` 时跳过）
-- C++：clang-format
+- C / C++：clang-format
+- JSON / JSONC：prettier
+- Bash / sh：shfmt
 - 所有文件：去掉行尾空白
 
 也可手动用 `:Format` / `:FormatWrite` 命令。
