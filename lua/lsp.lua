@@ -14,7 +14,7 @@ require('mason').setup({
 require('mason-lspconfig').setup({
     -- 没装就自动装；这里写的是 mason 的 server 名，
     -- 与下面的 vim.lsp.enable 里用的是 lspconfig 名（基本一致）
-    ensure_installed = { 'pylsp', 'lua_ls', 'clangd' },
+    ensure_installed = { 'pylsp', 'lua_ls', 'clangd', 'bash-language-server', 'json-lsp' },
 })
 
 -- 诊断相关的全局键位（跟旧版一致）
@@ -61,6 +61,25 @@ vim.lsp.config('lua_ls', { capabilities = capabilities })
 vim.lsp.config('pylsp', { capabilities = capabilities })
 vim.lsp.config('clangd', { capabilities = capabilities })
 
+-- JSON：附带 schemas for common configs（package.json/tsconfig/vscode settings…）
+-- 这是 lspconfig 'jsonls' 的标准启动方式
+vim.lsp.config('jsonls', {
+    cmd = { 'vscode-json-language-server', '--stdio' },
+    filetypes = { 'json', 'jsonc' },
+    capabilities = capabilities,
+    init_options = {
+        provideFormatter = false,  -- 格式化交给 formatter.nvim，避免双份格式化干态
+        documentFormatting = false,
+    },
+})
+
+-- Bash：脚本补全/诊断/跳转
+vim.lsp.config('bashls', {
+    cmd = { 'bash-language-server', 'start' },
+    filetypes = { 'bash', 'sh' },
+    capabilities = capabilities,
+})
+
 -- Apple Swift / ObjC / ObjC++：用 Xcode 自带的 sourcekit-lsp
 -- "不要" 加入 mason 的 ensure_installed（它由 Xcode 提供）
 -- 已知坑：sourcekit-lsp 期望 language id = 'objective-c' / 'objective-cpp'，
@@ -94,4 +113,4 @@ vim.lsp.config('sourcekit', {
 })
 
 -- 真正启用这些 server
-vim.lsp.enable({ 'lua_ls', 'pylsp', 'clangd', 'sourcekit' })
+vim.lsp.enable({ 'lua_ls', 'pylsp', 'clangd', 'sourcekit', 'jsonls', 'bashls' })
