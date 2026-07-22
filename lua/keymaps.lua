@@ -14,8 +14,9 @@ vks('n',leaderKey..'<C-l>',':vertical resize -2<CR>',opts)
 vks('n',leaderKey..'<C-h>',':vertical resize +2<CR>',opts)
 vks('n','<space><tab>',':tabNext<CR>',opts)
 
--- 窗口切换：<C-h/j/k/l> 替代 <C-w>h/j/k/l
-vks('n','<C-h>','<C-w>h',opts)
-vks('n','<C-j>','<C-w>j',opts)
-vks('n','<C-k>','<C-w>k',opts)
-vks('n','<C-l>','<C-w>l',opts)
+-- 窗口切换：<A-h/j/k/l>（Option 键 + hjkl）用在 macOS 上
+-- <C-j> 在终端里和 <CR> 同码，不能用
+vks('n','<A-h>','<C-w>h',opts)
+vks('n','<A-j>','<C-w>j',opts)
+vks('n','<A-k>','<C-w>k',opts)
+vks('n','<A-l>','<C-w>l',opts)
