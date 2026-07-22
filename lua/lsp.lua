@@ -14,7 +14,7 @@ require('mason').setup({
 require('mason-lspconfig').setup({
     -- 没装就自动装；这里写的是 mason 的 server 名，
     -- 与下面的 vim.lsp.enable 里用的是 lspconfig 名（基本一致）
-    ensure_installed = { 'pylsp', 'lua_ls', 'clangd', 'bash-language-server', 'json-lsp' },
+    ensure_installed = { 'pylsp', 'lua_ls', 'clangd' },
 })
 
 -- mason-lspconfig 只负责 LSP server；formatter 须用 mason 原生 API 装

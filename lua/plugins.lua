@@ -48,13 +48,6 @@ require("lazy").setup({
                 documentation = { auto_show = false },
             },
 
-            -- LuaSnip 作为片段展开引擎
-            snippet = {
-                expand = function(snippet)
-                    require('luasnip').lsp_expand(snippet)
-                end,
-            },
-
             -- 启用的补全源（内置，无需另装插件）
             sources = {
                 default = { 'lsp', 'path', 'snippets', 'buffer' },
