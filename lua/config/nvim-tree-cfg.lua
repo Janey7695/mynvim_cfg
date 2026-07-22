@@ -23,7 +23,6 @@ end
 
 require("nvim-tree").setup({
     on_attach = my_on_attach,
-    auto_close = true,
     sort = {
         sorter = "case_sensitive",
     },
