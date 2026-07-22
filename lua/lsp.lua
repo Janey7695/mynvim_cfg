@@ -14,7 +14,7 @@ require('mason').setup({
 require('mason-lspconfig').setup({
     -- 没装就自动装；这里写的是 mason 的 server 名，
     -- 与下面的 vim.lsp.enable 里用的是 lspconfig 名（基本一致）
-    ensure_installed = { 'pylsp', 'lua_ls' },
+    ensure_installed = { 'pylsp', 'lua_ls', 'clangd' },
 })
 
 -- 诊断相关的全局键位（跟旧版一致）
