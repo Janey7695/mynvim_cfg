@@ -7,7 +7,8 @@ require("formatter").setup({
 	logging = true,
 	-- Set the log level
 	log_level = vim.log.levels.WARN,
-	-- All formatter configurations are opt-in
+	-- 注：formatter.nvim 自带的预置见 :h formatter.filetypes；我们手动写
+-- 是为了走 mason 装的 prettier/shfmt，而不用全局 PATH 里的版本。
 	filetype = {
 		-- Formatter configurations for filetype "lua" go here
 		-- and will be executed in order
@@ -51,6 +52,67 @@ require("formatter").setup({
 				}
 			end,
 		},
+		c = {
+			function()
+				return {
+					exe = "clang-format",
+					args = {
+						"-assume-filename",
+						util.escape_path(util.get_current_buffer_file_name()),
+					},
+					stdin = true,
+					try_node_modules = true,
+				}
+			end,
+		},
+		json = {
+			-- prettier 同时处理 json / jsonc；走 mason 装的 prettier
+			function()
+				return {
+					exe = "prettier",
+					args = {
+						"--stdin-filepath",
+						util.escape_path(util.get_current_buffer_file_path()),
+						"--no-config",
+						"--tab-width", "4",
+					},
+					stdin = true,
+				}
+			end,
+		},
+		["jsonc"] = {
+			function()
+				return {
+					exe = "prettier",
+					args = {
+						"--stdin-filepath",
+						util.escape_path(util.get_current_buffer_file_path()),
+						"--no-config",
+						"--tab-width", "4",
+					},
+					stdin = true,
+				}
+			end,
+		},
+		-- sh / bash：shfmt（默认 2 空格缩进，带 :-like POSIX 模式）
+		sh = {
+			function()
+				return {
+					exe = "shfmt",
+					args = { "-i", "4", "-" },
+					stdin = true,
+				}
+			end,
+		},
+		bash = {
+			function()
+				return {
+					exe = "shfmt",
+					args = { "-i", "4", "-bn", "-ci", "-" },
+					stdin = true,
+				}
+			end,
+		},
 		-- Use the special "*" filetype for defining formatter configurations on
 		-- any filetype
 		["*"] = {
@@ -64,7 +126,11 @@ require("formatter").setup({
 local augroup = vim.api.nvim_create_augroup
 local autocmd = vim.api.nvim_create_autocmd
 augroup("__formatter__", { clear = true })
-autocmd("BufWritePost", {
+autocmd("BufWritePre", {
 	group = "__formatter__",
-	command = ":FormatWrite",
+	callback = function()
+		-- vim.cmd.Format() doesn't work reliably in headless;
+		-- use the canonical string form instead
+		vim.cmd([[Format]])
+	end,
 })
