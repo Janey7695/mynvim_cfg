@@ -50,8 +50,10 @@ vim.cmd([[autocmd FileType markdown lua AddSurroundx("`","`",1)]])
 -- vim.cmd([[autocmd FileType markdown inoremap <buffer> <leader>` ```]])
 vim.cmd([[autocmd FileType markdown inoremap <buffer> ;; <esc>A;<cr>]])
 
-vim.cmd([[autocmd FileType cpp inoremap <buffer> ;; <esc>A;<cr>]])
-vim.cmd([[autocmd FileType cpp inoremap <buffer> <leader>pp <esc>A<space>{}<esc>i<cr><esc>O]])
-vim.cmd([[autocmd FileType cpp inoremap <buffer> ,, <esc>la,]])
+for _, ft in ipairs({ 'c', 'cpp', 'objc', 'objcpp' }) do
+    vim.cmd(string.format([[autocmd FileType %s inoremap <buffer> ;; <esc>A;<cr>]], ft))
+    vim.cmd(string.format([[autocmd FileType %s inoremap <buffer> <leader>pp <esc>A<space>{}<esc>i<cr><esc>O]], ft))
+    vim.cmd(string.format([[autocmd FileType %s inoremap <buffer> ,, <esc>la,]], ft))
+end
 
 vim.cmd([[autocmd FileType lua inoremap <buffer> ,, <esc>la,]])
