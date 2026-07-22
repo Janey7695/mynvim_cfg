@@ -11,8 +11,8 @@ require("neo-tree").setup({
         position = "left",
         width = 30, -- 和旧 nvim-tree 一致
         mappings = {
-            -- <CR> 打开文件，<bs> 回到父目录，? 帮助；沿用 nvim-tree 的习惯
-            ["<CR>"] = "open",
+            -- <CR> 在新标签页打开文件（像 VSCode tab 一样不覆盖当前编辑）
+            ["<CR>"] = "open_tabnew",
             ["<bs>"] = "navigate_up",
             ["?"] = "show_help",
         },
