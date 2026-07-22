@@ -52,11 +52,14 @@ vim.api.nvim_create_autocmd('LspAttach', {
     end,
 })
 
+-- 让 LSP server 知道客户端支持 snippet 等 blink 增强能力
+local capabilities = require('blink.cmp').get_lsp_capabilities()
+
 -- 各 server 的配置：用 vim.lsp.config 替代旧的 lspconfig.xxx.setup
 -- on_attach 不再需要，键位已由上面的 LspAttach 统一处理
-vim.lsp.config('lua_ls', {})
-vim.lsp.config('pylsp', {})
-vim.lsp.config('clangd', {})
+vim.lsp.config('lua_ls', { capabilities = capabilities })
+vim.lsp.config('pylsp', { capabilities = capabilities })
+vim.lsp.config('clangd', { capabilities = capabilities })
 
 -- 真正启用这些 server
 vim.lsp.enable({ 'lua_ls', 'pylsp', 'clangd' })

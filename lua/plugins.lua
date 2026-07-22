@@ -13,35 +13,78 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
     "tanvirtin/monokai.nvim",
--- Vscode-like pictograms
+
+    -- 补全引擎：blink.cmp（内置 LSP/path/snippets/buffer 源 + lspkind 图标，
+    -- 不再需要单独装 cmp-nvim-lsp/cmp-buffer/cmp-path/cmp-cmdline/lspkind）
     {
-            "onsails/lspkind.nvim",
-            event = { "VimEnter" },
-    },
-    -- Auto-completion engine
-    {
-            "hrsh7th/nvim-cmp",
-            dependencies = {
-                    "lspkind.nvim",
-                    "hrsh7th/cmp-nvim-lsp", -- lsp auto-completion
-                    "hrsh7th/cmp-buffer", -- buffer auto-completion
-                    "hrsh7th/cmp-path", -- path auto-completion
-                    "hrsh7th/cmp-cmdline", -- cmdline auto-completion
+        "saghen/blink.cmp",
+        -- 用 release tag 自动下载预编译的 Rust 模糊匹配器二进制
+        version = "1.*",
+        dependencies = {
+            "L3MON4D3/LuaSnip", -- 片段引擎（blink 支持，沿用旧的）
+        },
+        ---@module 'blink.cmp'
+        ---@type blink.cmp.Config
+        opts = {
+            -- 键位：基于 default preset（提供 C-space/C-e/C-p/C-n/C-b/C-f/C-y 等），
+            -- 然后覆盖 <Tab>/<S-Tab>/<CR> 以复刻原来 nvim-cmp 的"super tab"习惯
+            keymap = {
+                preset = 'default',
+                -- 菜单可见→选下一个；不可见→触发补全；都没→交给 Neovim Tab
+                ['<Tab>'] = { 'select_next', 'show', 'fallback' },
+                -- 菜单可见→选上一个；不在 snippet→snippet 跳回上一占位符；都没→fallback
+                ['<S-Tab>'] = { 'select_prev', 'snippet_backward', 'fallback' },
+                -- 回车确认当前候选（与原 cmp confirm { select = true } 等价）
+                ['<CR>'] = { 'accept', 'fallback' },
             },
-            config = function()
-                    require("config.nvim-cmp")
-            end,
+
+            appearance = {
+                -- Nerd Font Mono 对齐
+                nerd_font_variant = 'mono',
+            },
+
+            -- 默认只手动触发文档弹窗（保持原行为，避免分心）
+            completion = {
+                documentation = { auto_show = false },
+            },
+
+            -- LuaSnip 作为片段展开引擎
+            snippet = {
+                expand = function(snippet)
+                    require('luasnip').lsp_expand(snippet)
+                end,
+            },
+
+            -- 启用的补全源（内置，无需另装插件）
+            sources = {
+                default = { 'lsp', 'path', 'snippets', 'buffer' },
+            },
+
+            -- 实验性签名帮助（替代 lsp.lua 里 <C-k> 的 vim.lsp.buf.signature_help 体验更好）
+            signature = { enabled = true },
+
+            -- 优先用 Rust 模糊匹配器，下载失败时回落到 Lua 实现
+            fuzzy = {
+                implementation = "prefer_rust_with_warning",
+            },
+        },
+        opts_extend = { "sources.default" },
     },
-    -- LSP manager
+
+    -- LSP 管理器
     "williamboman/mason.nvim",
     "williamboman/mason-lspconfig.nvim",
     "neovim/nvim-lspconfig",
+
+    -- 代码格式化
     "mhartington/formatter.nvim",
-    -- Code snippet engine
+
+    -- 代码片段引擎（被 blink 调用，也用于你 snippets.lua 里的自定义片段）
     {
-            "L3MON4D3/LuaSnip",
-            version = "v2.*",
+        "L3MON4D3/LuaSnip",
+        version = "v2.*",
     },
+
     {
       "nvim-tree/nvim-tree.lua",
       version = "*",
