@@ -1,3 +1,6 @@
+-- LSP 配置（Neovim 0.11+ 的 vim.lsp.config / vim.lsp.enable 新范式）
+-- 参见 :help lspconfig-nvim-0.11
+
 require('mason').setup({
     ui = {
         icons = {
@@ -9,49 +12,51 @@ require('mason').setup({
 })
 
 require('mason-lspconfig').setup({
-    -- A list of servers to automatically install if they're not already installed
+    -- 没装就自动装；这里写的是 mason 的 server 名，
+    -- 与下面的 vim.lsp.enable 里用的是 lspconfig 名（基本一致）
     ensure_installed = { 'pylsp', 'lua_ls' },
 })
 
-local lspconfig = require('lspconfig')
+-- 诊断相关的全局键位（跟旧版一致）
+local opts = { noremap = true, silent = true }
+vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, opts)
+vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist, opts)
+vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
+vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
 
-local opts = { noremap = true, silent = true}
-vim.keymap.set('n','<space>e',vim.diagnostic.open_float,opts)
-vim.keymap.set('n','<space>q',vim.diagnostic.setloclist,opts)
-vim.keymap.set('n','[d',vim.diagnostic.goto_prev,opts)
-vim.keymap.set('n',']d',vim.diagnostic.goto_next,opts)
+-- 统一用 LspAttach autocmd 给 buffer 绑键位，替代旧的 on_attach
+vim.api.nvim_create_autocmd('LspAttach', {
+    group = vim.api.nvim_create_augroup('UserLspConfig', { clear = true }),
+    callback = function(ev)
+        local bufnr = ev.buf
+        vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 
-local on_attach = function(client, bufnr)
-    -- Enable completion triggered by <c-x><c-o>
-    vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
-
-    -- See `:help vim.lsp.*` for documentation on any of the below functions
-    local bufopts = { noremap = true, silent = true, buffer = bufnr }
-    vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, bufopts)
-    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
-    vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
-    vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
-    vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
-    vim.keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, bufopts)
-    vim.keymap.set('n', '<space>wr', vim.lsp.buf.remove_workspace_folder, bufopts)
-    vim.keymap.set('n', '<space>wl', function()
-        print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-    end, bufopts)
-    vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, bufopts)
-    vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, bufopts)
-    vim.keymap.set('n', '<space>ca', vim.lsp.buf.code_action, bufopts)
-    vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
-    vim.keymap.set("n", "<space>f", function()
-        vim.lsp.buf.format({ async = true })
-    end, bufopts)
-end
-
-lspconfig.lua_ls.setup({
-    on_attach = on_attach,
+        local bufopts = { noremap = true, silent = true, buffer = bufnr }
+        vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, bufopts)
+        vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
+        vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
+        vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
+        vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, bufopts)
+        vim.keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, bufopts)
+        vim.keymap.set('n', '<space>wr', vim.lsp.buf.remove_workspace_folder, bufopts)
+        vim.keymap.set('n', '<space>wl', function()
+            print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+        end, bufopts)
+        vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, bufopts)
+        vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, bufopts)
+        vim.keymap.set('n', '<space>ca', vim.lsp.buf.code_action, bufopts)
+        vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
+        vim.keymap.set('n', '<space>f', function()
+            vim.lsp.buf.format({ async = true })
+        end, bufopts)
+    end,
 })
-lspconfig.pylsp.setup({
-    on_attach = on_attach,
-})
-lspconfig.clangd.setup({
-    on_attach = on_attach,
-})
+
+-- 各 server 的配置：用 vim.lsp.config 替代旧的 lspconfig.xxx.setup
+-- on_attach 不再需要，键位已由上面的 LspAttach 统一处理
+vim.lsp.config('lua_ls', {})
+vim.lsp.config('pylsp', {})
+vim.lsp.config('clangd', {})
+
+-- 真正启用这些 server
+vim.lsp.enable({ 'lua_ls', 'pylsp', 'clangd' })
