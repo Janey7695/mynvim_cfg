@@ -17,6 +17,18 @@ require('mason-lspconfig').setup({
     ensure_installed = { 'pylsp', 'lua_ls', 'clangd', 'bash-language-server', 'json-lsp' },
 })
 
+-- mason-lspconfig 只负责 LSP server；formatter 须用 mason 原生 API 装
+local function ensure_mason_packages(pkgs)
+    local registry = require('mason-registry')
+    for _, pkg in ipairs(pkgs) do
+        local ok, p = pcall(registry.get_package, pkg)
+        if ok and p and not p:is_installed() then
+            p:install()
+        end
+    end
+end
+ensure_mason_packages({ 'stylua', 'prettier', 'shfmt', 'clang-format' })
+
 -- 诊断相关的全局键位（跟旧版一致）
 local opts = { noremap = true, silent = true }
 vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, opts)
