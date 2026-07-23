@@ -27,7 +27,7 @@ local function ensure_mason_packages(pkgs)
         end
     end
 end
-ensure_mason_packages({ 'stylua', 'prettier', 'shfmt', 'clang-format' })
+ensure_mason_packages({ 'stylua', 'prettier', 'shfmt', 'clang-format', 'ruff' })
 
 -- 诊断相关的全局键位（跟旧版一致）
 local opts = { noremap = true, silent = true }

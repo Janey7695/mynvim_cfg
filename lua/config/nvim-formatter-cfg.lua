@@ -39,6 +39,20 @@ require("formatter").setup({
 				}
 			end,
 		},
+		python = {
+			function()
+				return {
+					exe = "ruff",
+					args = {
+						"format",
+						"--stdin-filename",
+						util.escape_path(util.get_current_buffer_file_path()),
+						"-",
+					},
+					stdin = true,
+				}
+			end,
+		},
 		cpp = {
 			function()
 				return {
