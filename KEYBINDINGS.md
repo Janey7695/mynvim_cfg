@@ -23,6 +23,8 @@ Leader 键统一为 **空格 `<space>`**。
 | [`nvim-neo-tree/neo-tree.nvim`](https://github.com/nvim-neo-tree/neo-tree.nvim) (v3.x) | 文件树侧栏，内置 Git 状态、诊断图标 |
 | [`nvim-lua/plenary.nvim`](https://github.com/nvim-lua/plenary.nvim) + [`MunifTanjim/nui.nvim`](https://github.com/MunifTanjim/nui.nvim) | neo-tree 依赖的两个库（由 lazy 管理） |
 | [`nvim-tree/nvim-web-devicons`](https://github.com/nvim-tree/nvim-web-devicons) | 文件类型图标 |
+| [`ibhagwan/fzf-lua`](https://github.com/ibhagwan/fzf-lua) | **模糊检索**。文件名 / live grep / 选区 / 光标词 / buffer / 最近文件 / 当前文件 LSP symbols。依赖本机 `fzf` + `fd` + `rg` |
+| [`folke/flash.nvim`](https://github.com/folke/flash.nvim) | **文件内跳转**。`s`/`S` 贴标签跳；默认增强 `f`/`t`/`F`/`T`。无 treesitter，不启用 treesitter 跳 |
 
 > 已迁走的旧插件：`nvim-cmp` / `cmp-nvim-lsp` / `cmp-buffer` / `cmp-path` / `cmp-cmdline` / `lspkind.nvim`，全部由 blink.cmp 内置功能替代。
 
@@ -39,7 +41,7 @@ Leader 键统一为 **空格 `<space>`**。
 | `bashls` | Bash / sh | mason 自动 |
 | `sourcekit` | Swift / ObjC / ObjC++ | Xcode 自带 |
 
-> 注意：`.m` / `.mm` 文件类型被 `vim.filetype.add` 映射为 `objective-c` / `objective-cpp`以满足 sourcekit-lsp 的要求（见 known issue #3264）。
+> 注意：Neovim 0.12 把 `.m` 默认成 `matlab`。配置里映射为 `objc` / `objcpp` 以加载 `syntax/objc.vim`。sourcekit-lsp 要的 language id `objective-c` / `objective-cpp` 由 nvim-lspconfig 的 `get_language_id` 转换；不要把 filetype 设成 `objective-c`（没有对应 syntax 文件）。
 
 ---
 
@@ -126,7 +128,45 @@ Leader 键统一为 **空格 `<space>`**。
 
 设置：宽 30 列，左栏，大小写敏感排序，显示 dotfiles，Git 状态图标，当前文件自动跟随。
 
-### 6. 文本片段 / 引号配对（`lua/snippets.lua`）
+### 6. 模糊检索 fzf-lua（`lua/plugins.lua`）
+
+工程级检索走 fzf-lua；neo-tree 的 `/` 只过滤当前树节点，不能替代。
+键位用 `<space>s*`，**不用** `<space>f*`：`<space>f` 已是 LSP 格式化，再绑 `ff` 会让格式化等 `timeoutlen`。
+
+| 模式 | 按键 | 动作 |
+|---|---|---|
+| normal | `<space>sf` | 文件名模糊打开（`fd`） |
+| normal | `<space>sg` | 全仓 live grep（`rg`，边打边搜） |
+| visual | `<space>sg` | 用当前选区当查询做 grep |
+| normal | `<space>sw` | 搜光标下的词 |
+| normal | `<space>sb` | 已开 buffer |
+| normal | `<space>sr` | 最近打开的文件 |
+| normal | `<space>ss` | 当前文件 LSP document symbols |
+| normal | `<space>sl` | 当前 buffer 模糊搜行（`blines`，当前窗跳转） |
+
+浮窗内：
+
+| 按键 | 动作 |
+|---|---|
+| `<CR>` | 新 tab 打开（和 neo-tree `<CR>` = `open_tabnew` 一致；`<space>sl` 例外：当前窗） |
+| `<C-t>` | 新 tab 打开 |
+| `<C-s>` | 水平分屏 |
+| `<C-v>` | 垂直分屏 |
+| `<Esc>` | 关闭 |
+
+也可 `:FzfLua files` / `:FzfLua live_grep` / `:FzfLua blines` 等。文本匹配，不是 AST/语义搜索。
+
+### 7. 文件内跳转 flash.nvim（`lua/plugins.lua`）
+
+当前屏落点。`s` 覆盖默认 substitute（改用 `cl`）；`S` 覆盖 `cc` 式整行替换（改用 `cc`）。
+
+| 模式 | 按键 | 动作 |
+|---|---|---|
+| n / x / o | `s` | 双向 flash jump（打字符 → 标签 → 跳） |
+| n / x / o | `S` | 反向、不换窗、不 wrap |
+| n / x / o | `f` / `t` / `F` / `T` | 行内跳，由 flash 增强（插件加载后） |
+
+### 8. 文本片段 / 引号配对（`lua/snippets.lua`）
 
 这部分是**手写的按键逻辑**，不属于 LuaSnip 体系，而是用 `inoremap` 自己拼的：
 
@@ -166,7 +206,7 @@ Leader 键统一为 **空格 `<space>`**。
 | `br` | `BufRead ` |
 | `ft` | `FileType ` |
 
-### 7. 格式化（`lua/config/nvim-formatter-cfg.lua`）
+### 9. 格式化（`lua/config/nvim-formatter-cfg.lua`）
 
 无快捷键，**保存即格式化**（`BufWritePre → :Format`）。
 

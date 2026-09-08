@@ -9,12 +9,14 @@
 │   ├── basic_config.lua          # 基本编辑选项（缩进、行号、剪贴板、leader）
 │   ├── keymaps.lua               # 通用快捷键（窗口、tab、ESC 替代）
 │   ├── snippets.lua              # 手写的引号配对 / C++/Markdown / vim 缩写
-│   ├── plugins.lua               # lazy.nvim 插件清单（含 blink.cmp 配置）
+│   ├── plugins.lua               # lazy.nvim 插件清单（blink.cmp / fzf-lua 等）
 │   ├── lsp.lua                   # LSP：mason + vim.lsp.config/enable
 │   └── config/
 │       ├── neo-tree-cfg.lua       # 文件树
 │       └── nvim-formatter-cfg.lua# 保存时格式化
-└── KEYBINDINGS.md                 # 完整快捷键与插件清单（详见此文件）
+├── KEYBINDINGS.md                 # 完整快捷键与插件清单（详见此文件）
+├── README.md
+└── lazy-lock.json                 # lazy.nvim 插件锁
 ```
 
 ## 要求
@@ -22,6 +24,7 @@
 - **Neovim ≥ 0.11**（使用了 `vim.lsp.config` / `vim.lsp.enable` 新 API）
 - 一份 Nerd Font（用于文件树和补全菜单的图标）
 - 联网（首次启动 lazy.nvim 和 mason 会自动克隆 / 安装）
+- 本机 `fzf` / `fd` / `rg`（fzf-lua 用；macOS：`brew install fzf fd ripgrep`）
 
 ## 安装
 
@@ -58,6 +61,21 @@ nvim   # 首次启动会自动装好所有插件和 LSP server
   | Bash / sh | `shfmt` | mason 自动 |
   | 所有文件 | 去行尾空白 | 内置 |
 - **文件树**：[neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim) v3（内置 Git 状态显示）
+- **文件检索**：[fzf-lua](https://github.com/ibhagwan/fzf-lua)。文件名模糊 / live grep / 选区 / 光标词 / buffer / 最近文件 / 当前文件 LSP symbols。定义在 `lua/plugins.lua`，键位 `<space>s*`（避开已占用的 `<space>f` 格式化）
+
+  | 模式 | 按键 | 动作 |
+  |---|---|---|
+  | normal | `<space>sf` | 文件名模糊打开（`fd`） |
+  | normal | `<space>sg` | 全仓 live grep（`rg`） |
+  | visual | `<space>sg` | 用当前选区 grep |
+  | normal | `<space>sw` | 搜光标下的词 |
+  | normal | `<space>sb` | 已开 buffer |
+  | normal | `<space>sr` | 最近打开的文件 |
+  | normal | `<space>ss` | 当前文件 LSP symbols |
+  | normal | `<space>sl` | 当前 buffer 模糊搜行（当前窗跳转） |
+
+  浮窗：`<CR>` / `<C-t>` 新 tab（`<space>sl` 例外：当前窗）、`<C-s>` 水平分屏、`<C-v>` 垂直分屏。也可 `:FzfLua files`。
+- **文件内跳转**：[flash.nvim](https://github.com/folke/flash.nvim)。`s` / `S` 贴标签跳；`f`/`t` 增强。无 treesitter。
 
 完整的插件列表、每个插件干什么、以及所有快捷键的对照表，见 **[KEYBINDINGS.md](./KEYBINDINGS.md)**。
 
@@ -66,6 +84,9 @@ nvim   # 首次启动会自动装好所有插件和 LSP server
 | 按键 | 作用 |
 |---|---|
 | `<space>o` | 打开 / 关闭文件树 |
+| `<space>sf` / `<space>sg` / `<space>sw` / `<space>sl` | 文件名模糊 / 全仓 grep / 搜光标词 / 当前文件搜行 |
+| `<space>sb` / `<space>sr` / `<space>ss` | buffer / 最近文件 / 当前文件 symbols |
+| `s` / `S` | 文件内 flash 跳转 |
 | `<space>ec` / `<space>sc` | 编辑配置 / 重新加载配置 |
 | `<space>e` | 浮动诊断窗口 |
 | `gd` / `gr` / `K` | 跳定义 / 引用 / hover |

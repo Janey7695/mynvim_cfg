@@ -90,5 +90,67 @@ require("lazy").setup({
       config = function()
         require("config.neo-tree-cfg")
       end,
-    }
+    },
+
+    -- 模糊检索：文件名 / 内容 grep / buffer / LSP symbols
+    -- 键位用 <space>s*，避开已占用的 <space>f（LSP 格式化）
+    {
+        "ibhagwan/fzf-lua",
+        dependencies = { "nvim-tree/nvim-web-devicons" },
+        cmd = "FzfLua",
+        keys = {
+            { "<space>sf", function() require("fzf-lua").files() end, desc = "Find files" },
+            { "<space>sg", function() require("fzf-lua").live_grep() end, desc = "Live grep" },
+            { "<space>sg", function() require("fzf-lua").grep_visual() end, mode = "v", desc = "Grep selection" },
+            { "<space>sw", function() require("fzf-lua").grep_cword() end, desc = "Grep word" },
+            { "<space>sb", function() require("fzf-lua").buffers() end, desc = "Buffers" },
+            { "<space>sr", function() require("fzf-lua").oldfiles() end, desc = "Recent files" },
+            { "<space>ss", function() require("fzf-lua").lsp_document_symbols() end, desc = "Doc symbols" },
+            { "<space>sl", function() require("fzf-lua").blines() end, desc = "Buffer lines" },
+        },
+        -- <CR> 新 tab 打开（和 neo-tree open_tabnew 一致）；true 继承 ctrl-s/v/t
+        opts = function()
+            local actions = require("fzf-lua").actions
+            return {
+                actions = {
+                    files = {
+                        true,
+                        ["enter"] = actions.file_tabedit,
+                    },
+                },
+                lsp = {
+                    jump1_action = actions.file_tabedit,
+                },
+                -- 当前 buffer 行跳转留在本窗，不要再开一个同样文件的 tab
+                -- 不要在 picker.actions 里放 true：inherit 只对 setup.actions.files/buffers
+                -- 生效，留下的 [1]=true 会被 hide profile assert 炸掉
+                blines = {
+                    actions = {
+                        ["enter"] = actions.file_edit,
+                    },
+                },
+            }
+        end,
+    },
+
+    -- 文件内跳转：s/S 贴标签跳；f/t 由 flash 增强（VeryLazy 后生效）
+    -- 无 treesitter，S 不用 treesitter()，改成反向 jump。substitute 改用 cl
+    {
+        "folke/flash.nvim",
+        event = "VeryLazy",
+        opts = {},
+        keys = {
+            { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
+            {
+                "S",
+                mode = { "n", "x", "o" },
+                function()
+                    require("flash").jump({
+                        search = { forward = false, wrap = false, multi_window = false },
+                    })
+                end,
+                desc = "Flash backward",
+            },
+        },
+    },
 })

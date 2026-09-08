@@ -94,19 +94,19 @@ vim.lsp.config('bashls', {
 
 -- Apple Swift / ObjC / ObjC++：用 Xcode 自带的 sourcekit-lsp
 -- "不要" 加入 mason 的 ensure_installed（它由 Xcode 提供）
--- 已知坑：sourcekit-lsp 期望 language id = 'objective-c' / 'objective-cpp'，
--- 而 Neovim 默认把 .m/.mm 设为 'objc'/'objcpp'，会导致 ObjC 文件不补全。
--- 用 vim.filetype.add 把 .m/.mm 映射到 sourcekit 期望的名字解决。
+-- Neovim 0.12 把 .m 默认成 matlab，.mm 也不是 objcpp。必须显式映射到
+-- `objc`/`objcpp` 才能加载 syntax/objc.vim。不要映射成 `objective-c`：
+-- 没有对应 syntax 文件，高亮会丢。sourcekit 要的 language id 由
+-- nvim-lspconfig 的 get_language_id（objc → objective-c）转换。
 vim.filetype.add({
     extension = {
-        ['m']   = 'objective-c',
-        ['mm']  = 'objective-cpp',
-        ['swift'] = 'swift',
+        m = 'objc',
+        mm = 'objcpp',
     },
 })
 vim.lsp.config('sourcekit', {
     cmd = { 'xcrun', 'sourcekit-lsp' },
-    filetypes = { 'swift', 'objective-c', 'objective-cpp', 'c', 'cpp' },
+    filetypes = { 'swift', 'objc', 'objcpp', 'c', 'cpp' },
     root_dir = function(bufnr, on_dir)
         -- 新 API 的 root_dir 回调签名是 (bufnr, on_dir)；bufnr 是整数 buffer 号。
         -- 参见 :help vim.lsp.config
