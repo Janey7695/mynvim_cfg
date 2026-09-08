@@ -3,7 +3,7 @@
 本文档记录了 `~/.config/nvim` 这套配置里**已启用的插件**和**已配置的快捷键**，方便随时查阅。
 Leader 键统一为 **空格 `<space>`**。
 
-> 配置入口：`init.lua` → 依次加载 `basic_config` / `keymaps` / `snippets` / `plugins` / `monokai` / `lsp` / `config.nvim-tree-cfg` / `config.nvim-formatter-cfg`。
+> 配置入口：`init.lua` → 依次加载 `basic_config` / `keymaps` / `snippets` / `plugins` / `lsp` / `config.neo-tree-cfg` / `config.nvim-formatter-cfg`。
 
 ---
 
@@ -13,7 +13,7 @@ Leader 键统一为 **空格 `<space>`**。
 
 | 插件 | 作用 |
 |---|---|
-| [`tanvirtin/monokai.nvim`](https://github.com/tanvirtin/monokai.nvim) | 主题，使用 `pro` 调色板 |
+| [`catppuccin/nvim`](https://github.com/catppuccin/nvim) | 主题，flavour **latte**（浅色） |
 | [`saghen/blink.cmp`](https://github.com/saghen/blink.cmp) (v1.*) | **补全引擎**。内置 LSP / path / snippets / buffer 四个补全源，并自带 lspkind 风格的图标；用 Rust + SIMD 模糊匹配器（失败自动回落 Lua） |
 | [`L3MON4D3/LuaSnip`](https://github.com/L3MON4D3/LuaSnip) (v2.*) | 代码片段引擎，被 blink.cmp 调用展开 snippet 候选 |
 | [`williamboman/mason.nvim`](https://github.com/williamboman/mason.nvim) | LSP / formatter / linter 的"包管理器"，对应 `:Mason` 浮窗 |

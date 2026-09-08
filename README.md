@@ -1,6 +1,6 @@
 # 我的 Neovim 配置
 
-一套偏 Python / Lua / C++ 开发的轻量 Neovim 配置，Leader 键为 **空格**，主题用 Monokai Pro。
+一套偏 Python / Lua / C++ 开发的轻量 Neovim 配置，Leader 键为 **空格**，主题用 Catppuccin Latte。
 
 ```
 ~/.config/nvim/
@@ -38,7 +38,7 @@ nvim   # 首次启动会自动装好所有插件和 LSP server
 
 ## 包含什么
 
-- **主题**：[monokai.nvim](https://github.com/tanvirtin/monokai.nvim)
+- **主题**：[catppuccin](https://github.com/catppuccin/nvim) latte（浅色）
 - **补全**：[blink.cmp](https://github.com/saghen/blink.cmp) v1（Rust + SIMD 模糊匹配，内置 LSP/path/snippets/buffer 源和图标）
 - **片段**：[LuaSnip](https://github.com/L3MON4D3/LuaSnip) v2
 - **LSP**：[mason.nvim](https://github.com/williamboman/mason.nvim) + [mason-lspconfig](https://github.com/williamboman/mason-lspconfig.nvim) + [nvim-lspconfig](https://github.com/neovim/nvim-lspconfig)

@@ -4,7 +4,7 @@ Personal Neovim config for Python / Lua / C++ (plus JSON, Bash, Swift/ObjC). Lea
 
 ## Project Overview
 
-Dotfiles, not an application. `init.lua` loads Lua modules; `lua/plugins.lua` bootstraps [lazy.nvim](https://github.com/folke/lazy.nvim); LSP/formatters come from mason; UI is Monokai Pro + neo-tree + blink.cmp + fzf-lua.
+Dotfiles, not an application. `init.lua` loads Lua modules; `lua/plugins.lua` bootstraps [lazy.nvim](https://github.com/folke/lazy.nvim); LSP/formatters come from mason; UI is Catppuccin Latte + neo-tree + blink.cmp + fzf-lua.
 
 There is no build system, no CI, no test suite, no `scripts/`. Success = `nvim` starts, plugins load, keymaps fire.
 
@@ -13,8 +13,8 @@ There is no build system, no CI, no test suite, no `scripts/`. Success = `nvim` 
 Strict eager load in `init.lua` (no `ftplugin/`, no `lazy.lua`):
 
 ```
-basic_config → keymaps → snippets → plugins (lazy.setup)
-  → monokai.setup{palette=pro} → lsp
+basic_config → keymaps → snippets → plugins (lazy.setup, catppuccin-latte)
+  → lsp
   → config.neo-tree-cfg → config.nvim-formatter-cfg
   → print(">^.^< happy coding mio~")
 ```

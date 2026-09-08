@@ -64,7 +64,26 @@ end
 
 
 require("lazy").setup({
-    "tanvirtin/monokai.nvim",
+    {
+        "catppuccin/nvim",
+        name = "catppuccin",
+        priority = 1000,
+        opts = {
+            flavour = "latte",
+            integrations = {
+                treesitter = true,
+                native_lsp = { enabled = true },
+                neotree = true,
+                blink_cmp = true,
+                fzf = true,
+            },
+        },
+        config = function(_, opts)
+            require("catppuccin").setup(opts)
+            vim.cmd.colorscheme("catppuccin-latte")
+        end,
+    },
+
 
     -- 补全引擎：blink.cmp（内置 LSP/path/snippets/buffer 源 + lspkind 图标，
     -- 不再需要单独装 cmp-nvim-lsp/cmp-buffer/cmp-path/cmp-cmdline/lspkind）

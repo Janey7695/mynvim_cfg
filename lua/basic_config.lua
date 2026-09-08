@@ -8,6 +8,9 @@ vim.opt.softtabstop = 4
 vim.opt.expandtab = true
 vim.opt.hlsearch = false
 vim.opt.showtabline = 2 -- 始终显示标签栏
+vim.opt.termguicolors = true
+vim.opt.background = "light"
+
 vim.cmd([[:let mapleader = "\<space>"]])
 
 

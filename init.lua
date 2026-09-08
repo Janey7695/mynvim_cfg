@@ -2,7 +2,6 @@ require'basic_config'
 require'keymaps'
 require'snippets'
 require'plugins'
-require'monokai'.setup{ palette = require'monokai'.pro}
 require'lsp'
 require'config.neo-tree-cfg'
 require'config.nvim-formatter-cfg'
