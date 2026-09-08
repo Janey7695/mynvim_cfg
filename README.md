@@ -21,10 +21,11 @@
 
 ## 要求
 
-- **Neovim ≥ 0.11**（使用了 `vim.lsp.config` / `vim.lsp.enable` 新 API）
+- **Neovim ≥ 0.12**（`vim.lsp.config` / `vim.lsp.enable`，以及 nvim-treesitter `main`）
 - 一份 Nerd Font（用于文件树和补全菜单的图标）
 - 联网（首次启动 lazy.nvim 和 mason 会自动克隆 / 安装）
 - 本机 `fzf` / `fd` / `rg`（fzf-lua 用；macOS：`brew install fzf fd ripgrep`）
+- 本机 `tree-sitter` CLI（nvim-treesitter `main`；`brew install tree-sitter-cli`）
 
 ## 安装
 
@@ -75,7 +76,10 @@ nvim   # 首次启动会自动装好所有插件和 LSP server
   | normal | `<space>sl` | 当前 buffer 模糊搜行（当前窗跳转） |
 
   浮窗：`<CR>` / `<C-t>` 新 tab（`<space>sl` 例外：当前窗）、`<C-s>` 水平分屏、`<C-v>` 垂直分屏。也可 `:FzfLua files`。
-- **文件内跳转**：[flash.nvim](https://github.com/folke/flash.nvim)。`s` / `S` 贴标签跳；`f`/`t` 增强。无 treesitter。
+- **文件内跳转**：[flash.nvim](https://github.com/folke/flash.nvim)。`s` / `S` 贴标签跳；`f`/`t` 增强
+- **语法树**：[nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) `main`（高亮；不启 indent/fold）+ [nvim-treesitter-context](https://github.com/nvim-treesitter/nvim-treesitter-context)（窗口顶部钉函数/类签名）
+
+  工程检索：项目根 `.fzf-roots`（白名单目录/文件；`!name` 排除，如 `!.iac`）。无该文件则全仓。
 
 完整的插件列表、每个插件干什么、以及所有快捷键的对照表，见 **[KEYBINDINGS.md](./KEYBINDINGS.md)**。
 

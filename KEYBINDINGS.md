@@ -24,7 +24,9 @@ Leader 键统一为 **空格 `<space>`**。
 | [`nvim-lua/plenary.nvim`](https://github.com/nvim-lua/plenary.nvim) + [`MunifTanjim/nui.nvim`](https://github.com/MunifTanjim/nui.nvim) | neo-tree 依赖的两个库（由 lazy 管理） |
 | [`nvim-tree/nvim-web-devicons`](https://github.com/nvim-tree/nvim-web-devicons) | 文件类型图标 |
 | [`ibhagwan/fzf-lua`](https://github.com/ibhagwan/fzf-lua) | **模糊检索**。文件名 / live grep / 选区 / 光标词 / buffer / 最近文件 / 当前文件 LSP symbols。依赖本机 `fzf` + `fd` + `rg` |
-| [`folke/flash.nvim`](https://github.com/folke/flash.nvim) | **文件内跳转**。`s`/`S` 贴标签跳；默认增强 `f`/`t`/`F`/`T`。无 treesitter，不启用 treesitter 跳 |
+| [`folke/flash.nvim`](https://github.com/folke/flash.nvim) | **文件内跳转**。`s`/`S` 贴标签跳；默认增强 `f`/`t`/`F`/`T`。`S` 不用 treesitter 选区 |
+| [`nvim-treesitter/nvim-treesitter`](https://github.com/nvim-treesitter/nvim-treesitter) (`main`) | 语法树 parser。高亮 `vim.treesitter.start()`；不启 indent/fold。需本机 `tree-sitter` CLI + C 编译器 |
+| [`nvim-treesitter/nvim-treesitter-context`](https://github.com/nvim-treesitter/nvim-treesitter-context) | 滚进函数/类时把签名钉在窗口顶部。objc 的 context query 暂不支持 |
 
 > 已迁走的旧插件：`nvim-cmp` / `cmp-nvim-lsp` / `cmp-buffer` / `cmp-path` / `cmp-cmdline` / `lspkind.nvim`，全部由 blink.cmp 内置功能替代。
 
@@ -132,6 +134,7 @@ Leader 键统一为 **空格 `<space>`**。
 
 工程级检索走 fzf-lua；neo-tree 的 `/` 只过滤当前树节点，不能替代。
 键位用 `<space>s*`，**不用** `<space>f*`：`<space>f` 已是 LSP 格式化，再绑 `ff` 会让格式化等 `timeoutlen`。
+项目根放 `.fzf-roots`：普通行是白名单目录/文件，`!name` 排除任意深度的该名（如 `!.iac`）。没有该文件则搜整个仓库。不写进插件。
 
 | 模式 | 按键 | 动作 |
 |---|---|---|
@@ -166,7 +169,12 @@ Leader 键统一为 **空格 `<space>`**。
 | n / x / o | `S` | 反向、不换窗、不 wrap |
 | n / x / o | `f` / `t` / `F` / `T` | 行内跳，由 flash 增强（插件加载后） |
 
-### 8. 文本片段 / 引号配对（`lua/snippets.lua`）
+### 8. 函数签名钉住 treesitter-context（`lua/plugins.lua`）
+
+无新快捷键。进入长函数后，窗口顶部最多钉 3 行真实源码（函数/类，也会钉 `if`/`for`）。
+`:TSContextToggle` 开关。C/C++/Python/Lua/Swift 用上游 query；objc 用仓库内 `queries/objc/context.scm`。
+
+### 9. 文本片段 / 引号配对（`lua/snippets.lua`）
 
 这部分是**手写的按键逻辑**，不属于 LuaSnip 体系，而是用 `inoremap` 自己拼的：
 
@@ -206,7 +214,7 @@ Leader 键统一为 **空格 `<space>`**。
 | `br` | `BufRead ` |
 | `ft` | `FileType ` |
 
-### 9. 格式化（`lua/config/nvim-formatter-cfg.lua`）
+### 10. 格式化（`lua/config/nvim-formatter-cfg.lua`）
 
 无快捷键，**保存即格式化**（`BufWritePre → :Format`）。
 

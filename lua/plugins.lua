@@ -11,6 +11,58 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+-- 工程检索范围：项目根（含 .git 或 .fzf-roots）下的 `.fzf-roots`
+-- 普通行：相对目录/文件白名单；`!name`：排除（任意深度，如 !.iac）
+-- `#` 开头为注释。文件不存在则搜整个仓库。
+local function fzf_project_opts()
+    local start = vim.fn.getcwd()
+    local root = vim.fs.root(start, { ".fzf-roots", ".git" }) or start
+    local opts = { cwd = root }
+    local fh = io.open(root .. "/.fzf-roots", "r")
+    if not fh then
+        return opts
+    end
+    local paths, excludes = {}, {}
+    for line in fh:lines() do
+        line = vim.trim(line)
+        if line ~= "" and line:sub(1, 1) ~= "#" then
+            if line:sub(1, 1) == "!" then
+                local ex = vim.trim(line:sub(2)):gsub("/+$", "")
+                if ex ~= "" then
+                    table.insert(excludes, ex)
+                end
+            else
+                table.insert(paths, line)
+            end
+        end
+    end
+    fh:close()
+    if #paths > 0 then
+        opts.search_paths = paths
+    end
+    if #excludes > 0 then
+        local d = require("fzf-lua.defaults").defaults
+        local fd_ex, rg_globs = "", ""
+        for _, ex in ipairs(excludes) do
+            fd_ex = fd_ex .. " --exclude " .. vim.fn.shellescape(ex)
+            rg_globs = rg_globs
+                .. " --glob "
+                .. vim.fn.shellescape("!" .. ex)
+                .. " --glob "
+                .. vim.fn.shellescape("!" .. ex .. "/**")
+        end
+        opts.fd_opts = d.files.fd_opts .. fd_ex
+        local rg = d.grep.rg_opts
+        if rg:find("%-e%s*$") then
+            opts.rg_opts = rg:gsub("%-e%s*$", "") .. rg_globs .. " -e"
+        else
+            opts.rg_opts = rg .. rg_globs
+        end
+    end
+    return opts
+end
+
+
 require("lazy").setup({
     "tanvirtin/monokai.nvim",
 
@@ -99,10 +151,10 @@ require("lazy").setup({
         dependencies = { "nvim-tree/nvim-web-devicons" },
         cmd = "FzfLua",
         keys = {
-            { "<space>sf", function() require("fzf-lua").files() end, desc = "Find files" },
-            { "<space>sg", function() require("fzf-lua").live_grep() end, desc = "Live grep" },
-            { "<space>sg", function() require("fzf-lua").grep_visual() end, mode = "v", desc = "Grep selection" },
-            { "<space>sw", function() require("fzf-lua").grep_cword() end, desc = "Grep word" },
+            { "<space>sf", function() require("fzf-lua").files(fzf_project_opts()) end, desc = "Find files" },
+            { "<space>sg", function() require("fzf-lua").live_grep(fzf_project_opts()) end, desc = "Live grep" },
+            { "<space>sg", function() require("fzf-lua").grep_visual(fzf_project_opts()) end, mode = "v", desc = "Grep selection" },
+            { "<space>sw", function() require("fzf-lua").grep_cword(fzf_project_opts()) end, desc = "Grep word" },
             { "<space>sb", function() require("fzf-lua").buffers() end, desc = "Buffers" },
             { "<space>sr", function() require("fzf-lua").oldfiles() end, desc = "Recent files" },
             { "<space>ss", function() require("fzf-lua").lsp_document_symbols() end, desc = "Doc symbols" },
@@ -134,7 +186,7 @@ require("lazy").setup({
     },
 
     -- 文件内跳转：s/S 贴标签跳；f/t 由 flash 增强（VeryLazy 后生效）
-    -- 无 treesitter，S 不用 treesitter()，改成反向 jump。substitute 改用 cl
+    -- S 不用 flash.treesitter()（要选区不是跳点）。substitute 改用 cl
     {
         "folke/flash.nvim",
         event = "VeryLazy",
@@ -151,6 +203,45 @@ require("lazy").setup({
                 end,
                 desc = "Flash backward",
             },
+        },
+    },
+
+    -- Neovim 0.12：nvim-treesitter main。装 parser；FileType 上 vim.treesitter.start 开高亮。
+    -- 不启 indent/fold。objc context query 上游暂不支持，C/C++/Python/Lua 可以钉签名。
+    {
+        "nvim-treesitter/nvim-treesitter",
+        branch = "main",
+        lazy = false,
+        build = ":TSUpdate",
+        config = function()
+            local langs = {
+                "lua", "python", "c", "cpp", "objc", "bash",
+                "json", "markdown", "vim", "vimdoc", "query", "swift",
+            }
+            require("nvim-treesitter").install(langs)
+            vim.treesitter.language.register("objc", "objcpp")
+            vim.treesitter.language.register("json", "jsonc")
+            vim.treesitter.language.register("bash", "sh")
+            vim.api.nvim_create_autocmd("FileType", {
+                pattern = {
+                    "lua", "python", "c", "cpp", "objc", "objcpp",
+                    "bash", "sh", "json", "jsonc", "markdown", "vim", "swift",
+                },
+                callback = function()
+                    pcall(vim.treesitter.start)
+                end,
+            })
+        end,
+    },
+
+    -- 滚进函数/类内部时把签名钉在窗口顶部（VS Code sticky scroll）
+    {
+        "nvim-treesitter/nvim-treesitter-context",
+        event = "VeryLazy",
+        opts = {
+            max_lines = 3,
+            multiline_threshold = 1,
+            mode = "cursor",
         },
     },
 })
