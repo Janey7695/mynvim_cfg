@@ -4,7 +4,7 @@ Personal Neovim config for Python / Lua / C++ (plus JSON, Bash, Swift/ObjC). Lea
 
 ## Project Overview
 
-Dotfiles, not an application. `init.lua` loads Lua modules; `lua/plugins.lua` bootstraps [lazy.nvim](https://github.com/folke/lazy.nvim); LSP/formatters come from mason; UI is Catppuccin Latte + neo-tree + blink.cmp + fzf-lua.
+Dotfiles, not an application. `init.lua` loads Lua modules; `lua/plugins.lua` bootstraps [lazy.nvim](https://github.com/folke/lazy.nvim); LSP/formatters come from mason; UI is Catppuccin Latte + neo-tree + blink.cmp + fzf-lua + vim-illuminate + gitsigns.
 
 There is no build system, no CI, no test suite, no `scripts/`. Success = `nvim` starts, plugins load, keymaps fire.
 
@@ -87,7 +87,7 @@ Do not prove `:Format` headless — the formatter config comments that it is unr
 - **LSP:** `vim.lsp.config(name, { capabilities, cmd?, filetypes?, ... })` then `vim.lsp.enable({...})`. mason-lspconfig `ensure_installed` is **only** LSP servers (`pylsp`, `lua_ls`, `clangd`). Extra mason packages use `ensure_mason_packages()` in `lua/lsp.lua` (`stylua`, `prettier`, `shfmt`, `clang-format`, `ruff`). `sourcekit` is `xcrun sourcekit-lsp` — not mason.
 - **Filetypes:** `.m` / `.mm` → `objc` / `objcpp` via `vim.filetype.add` (Neovim 0.12 defaults `.m` to `matlab`). Never map to `objective-c` — no `syntax/objective-c.vim`. sourcekit language id is remapped by lspconfig `get_language_id`.
 - **jsonls** must keep formatter disabled. Lua stylua skips filename `special.lua`.
-- **neo-tree / fzf-lua:** `<CR>` opens a **new tab** (`open_tabnew` / `actions.file_tabedit`), never replaces the current window — **except** `blines` (`<space>sl`): `enter` is `file_edit` so it stays in the current window. Override lives in `lua/plugins.lua` `opts`. Per-project roots: `<git-or-cwd>/.fzf-roots` (whitelist lines; `!name` excludes that name at any depth, e.g. `!.iac`). Missing file → whole repo. Do not hardcode roots in the plugin spec.
+- **neo-tree / fzf-lua:** `<CR>` opens a **new tab** (`open_tabnew` / `actions.file_tabedit`), never replaces the current window — **except** `blines` (`<space>sl`): `enter` is `file_edit` so it stays in the current window. Override lives in `lua/plugins.lua` `opts`. Per-project roots: `<git-or-cwd>/.fzf-roots` (whitelist lines; `!pattern` is glob exclude at any depth, e.g. `!.iac`, `!*UnitTests`; not PCRE). Missing file → whole repo. Do not hardcode roots in the plugin spec.
 - **flash.nvim:** `s`/`S` jump. Do not map `S` to `flash.treesitter()` (that is visual selection, not a jump). `f`/`t` enhanced after VeryLazy. Substitute → `cl`.
 - **treesitter:** `nvim-treesitter` **main** (Nvim ≥ 0.12), `lazy=false`. Parsers via `require("nvim-treesitter").install`; highlight via `FileType` → `vim.treesitter.start()`. Do **not** enable indent/fold. Context pins ≤3 lines. ObjC sticky query is local: `queries/objc/context.scm` (upstream has none). Needs `tree-sitter` CLI (`brew install tree-sitter-cli`).
 - **Invariants:** `autocmd BufNewFile * :write` writes every new buffer immediately. Statusline is hardcoded in `init.lua`. `clipboard=unnamedplus` + visual `<LeftRelease>` → `ygv`.

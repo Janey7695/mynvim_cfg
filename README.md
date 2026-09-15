@@ -78,8 +78,10 @@ nvim   # 首次启动会自动装好所有插件和 LSP server
   浮窗：`<CR>` / `<C-t>` 新 tab（`<space>sl` 例外：当前窗）、`<C-s>` 水平分屏、`<C-v>` 垂直分屏。也可 `:FzfLua files`。
 - **文件内跳转**：[flash.nvim](https://github.com/folke/flash.nvim)。`s` / `S` 贴标签跳；`f`/`t` 增强
 - **语法树**：[nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) `main`（高亮；不启 indent/fold）+ [nvim-treesitter-context](https://github.com/nvim-treesitter/nvim-treesitter-context)（窗口顶部钉函数/类签名）
+- **同名引用高亮**：[vim-illuminate](https://github.com/RRethy/vim-illuminate)。光标停在变量/函数上时淡高亮同屏其它同一符号
+- **Git gutter**：[gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim)。行号左侧 `+` / `-` / `~`
 
-  工程检索：项目根 `.fzf-roots`（白名单目录/文件；`!name` 排除，如 `!.iac`）。无该文件则全仓。
+  工程检索：项目根 `.fzf-roots`（白名单目录/文件；`!pattern` glob 排除，如 `!.iac`、`!*UnitTests`）。无该文件则全仓。
 
 完整的插件列表、每个插件干什么、以及所有快捷键的对照表，见 **[KEYBINDINGS.md](./KEYBINDINGS.md)**。
 
@@ -95,6 +97,7 @@ nvim   # 首次启动会自动装好所有插件和 LSP server
 | `<space>e` | 浮动诊断窗口 |
 | `gd` / `gr` / `K` | 跳定义 / 引用 / hover |
 | `<space>rn` / `<space>ca` | 重命名 / code action |
+| `<space>ph` | 预览当前 Git hunk |
 | `<space>f` | LSP 格式化 |
 | `<Tab>` / `<S-Tab>` / `<CR>` | 在补全菜单中选 / 接受 |
 | `jj` | insert 模式下回到 normal |

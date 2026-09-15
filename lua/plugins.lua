@@ -12,8 +12,9 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 -- 工程检索范围：项目根（含 .git 或 .fzf-roots）下的 `.fzf-roots`
--- 普通行：相对目录/文件白名单；`!name`：排除（任意深度，如 !.iac）
--- `#` 开头为注释。文件不存在则搜整个仓库。
+-- 普通行：相对目录/文件白名单
+-- `!pattern`：排除，fd/rg glob（任意深度）。例：!.iac  !*UnitTests
+-- `#` 开头为注释。文件不存在则搜整个仓库。不是 PCRE。
 local function fzf_project_opts()
     local start = vim.fn.getcwd()
     local root = vim.fs.root(start, { ".fzf-roots", ".git" }) or start
@@ -45,11 +46,21 @@ local function fzf_project_opts()
         local fd_ex, rg_globs = "", ""
         for _, ex in ipairs(excludes) do
             fd_ex = fd_ex .. " --exclude " .. vim.fn.shellescape(ex)
-            rg_globs = rg_globs
-                .. " --glob "
-                .. vim.fn.shellescape("!" .. ex)
-                .. " --glob "
-                .. vim.fn.shellescape("!" .. ex .. "/**")
+            local globs
+            if ex:find("/", 1, true) then
+                globs = { "!" .. ex, "!" .. ex .. "/**" }
+            else
+                -- 根目录 + 任意深度（rg 的 * 不跨 /）
+                globs = {
+                    "!" .. ex,
+                    "!" .. ex .. "/**",
+                    "!**/" .. ex,
+                    "!**/" .. ex .. "/**",
+                }
+            end
+            for _, g in ipairs(globs) do
+                rg_globs = rg_globs .. " --glob " .. vim.fn.shellescape(g)
+            end
         end
         opts.fd_opts = d.files.fd_opts .. fd_ex
         local rg = d.grep.rg_opts
@@ -70,12 +81,23 @@ require("lazy").setup({
         priority = 1000,
         opts = {
             flavour = "latte",
+            -- 默认 Cursor 是 rosewater，浅底插入竖条几乎看不见
+            custom_highlights = function(colors)
+                return {
+                    Cursor = { fg = colors.base, bg = colors.red },
+                    lCursor = { fg = colors.base, bg = colors.red },
+                    CursorIM = { fg = colors.base, bg = colors.red },
+                    TermCursor = { fg = colors.base, bg = colors.red },
+                }
+            end,
             integrations = {
                 treesitter = true,
                 native_lsp = { enabled = true },
                 neotree = true,
                 blink_cmp = true,
                 fzf = true,
+                illuminate = true,
+                gitsigns = true,
             },
         },
         config = function(_, opts)
@@ -97,24 +119,21 @@ require("lazy").setup({
         ---@module 'blink.cmp'
         ---@type blink.cmp.Config
         opts = {
-            -- 键位：基于 default preset（提供 C-space/C-e/C-p/C-n/C-b/C-f/C-y 等），
-            -- 然后覆盖 <Tab>/<S-Tab>/<CR> 以复刻原来 nvim-cmp 的"super tab"习惯
+            -- 键位：基于 default preset（C-space/C-e/C-p/C-n/C-y 等）
+            -- <Tab>/<S-Tab>/<CR> 复刻 nvim-cmp super-tab；菜单仍预选第一项
             keymap = {
                 preset = 'default',
-                -- 菜单可见→选下一个；不可见→触发补全；都没→交给 Neovim Tab
                 ['<Tab>'] = { 'select_next', 'show', 'fallback' },
-                -- 菜单可见→选上一个；不在 snippet→snippet 跳回上一占位符；都没→fallback
                 ['<S-Tab>'] = { 'select_prev', 'snippet_backward', 'fallback' },
-                -- 回车确认当前候选（与原 cmp confirm { select = true } 等价）
                 ['<CR>'] = { 'accept', 'fallback' },
+                -- 菜单开着：关菜单并留在 insert；关掉了：正常 Esc 回 normal
+                ['<Esc>'] = { 'hide', 'fallback' },
             },
 
             appearance = {
-                -- Nerd Font Mono 对齐
                 nerd_font_variant = 'mono',
             },
 
-            -- 默认只手动触发文档弹窗（保持原行为，避免分心）
             completion = {
                 documentation = { auto_show = false },
             },
@@ -261,6 +280,43 @@ require("lazy").setup({
             max_lines = 3,
             multiline_threshold = 1,
             mode = "cursor",
+        },
+    },
+
+    -- 光标停在标识符上时，同屏其它同一符号淡高亮（LSP → treesitter → regex）
+    {
+        "RRethy/vim-illuminate",
+        event = "VeryLazy",
+        config = function()
+            require("illuminate").configure({
+                delay = 200,
+                filetypes_denylist = { "neo-tree", "qf", "mason", "lazy" },
+                disable_keymaps = true,
+            })
+            -- plugin/*.vim 在 config 之前已按默认绑上 <A-n>/<A-p>/<A-i>
+            pcall(vim.keymap.del, "n", "<A-n>")
+            pcall(vim.keymap.del, "n", "<A-p>")
+            pcall(vim.keymap.del, "o", "<A-i>")
+            pcall(vim.keymap.del, "x", "<A-i>")
+        end,
+    },
+
+    -- Git 行号旁 +/-/~；preview 用 <space>ph（避开 <space>h 切窗）
+    {
+        "lewis6991/gitsigns.nvim",
+        event = { "BufReadPre", "BufNewFile" },
+        keys = {
+            { "<space>ph", function() require("gitsigns").preview_hunk() end, desc = "Preview git hunk" },
+        },
+        opts = {
+            signs = {
+                add = { text = "+" },
+                change = { text = "~" },
+                delete = { text = "-" },
+                topdelete = { text = "-" },
+                changedelete = { text = "~" },
+                untracked = { text = "+" },
+            },
         },
     },
 })
