@@ -106,7 +106,7 @@ Leader 键统一为 **空格 `<space>`**。
 | `K` | hover 文档 |
 | `gi` | implementation |
 | `<C-k>` | signature help |
-| `<space>wa` / `wr` / `wl` | 添加 / 移除 / 列出 workspace folder |
+| `<space>wa` / `wr` / `wf` | 添加 / 移除 / 列出 workspace folder |
 | `<space>D` | type definition |
 | `<space>rn` | rename 符号 |
 | `<space>ca` | code action |
@@ -149,6 +149,7 @@ Leader 键统一为 **空格 `<space>`**。
 | normal | `<space>sr` | 最近打开的文件 |
 | normal | `<space>ss` | 当前文件 LSP document symbols |
 | normal | `<space>sl` | 当前 buffer 模糊搜行（`blines`，当前窗跳转） |
+| normal | `<space>wl` | 用光标下的词预填当前 buffer 行搜索（`blines`） |
 
 浮窗内：
 

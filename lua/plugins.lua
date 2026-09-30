@@ -197,6 +197,7 @@ require("lazy").setup({
             { "<space>sr", function() require("fzf-lua").oldfiles() end, desc = "Recent files" },
             { "<space>ss", function() require("fzf-lua").lsp_document_symbols() end, desc = "Doc symbols" },
             { "<space>sl", function() require("fzf-lua").blines() end, desc = "Buffer lines" },
+            { "<space>wl", function() require("fzf-lua").blines({ query = vim.fn.expand("<cword>") }) end, desc = "Buffer lines for word" },
         },
         -- <CR> 新 tab 打开（和 neo-tree open_tabnew 一致）；true 继承 ctrl-s/v/t
         opts = function()
